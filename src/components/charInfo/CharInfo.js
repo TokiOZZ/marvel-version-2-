@@ -33,6 +33,7 @@ const CharInfo = ({ id }) => {
     }
 
     const getRandomChar = () => {
+        setIsError(false)
         setIsLoading(true)
         marvelService
             .getCharacter(id)
@@ -46,9 +47,11 @@ const CharInfo = ({ id }) => {
     const loading = isLoading ? <Spinner /> : null
     const error = isError ? <ErrorMesage /> : null
 
+    const styleFix = isError ? { margin: "0 auto" } : null
+
 
     return (
-        <div className="char__info">
+        <div className="char__info" style={styleFix}>
             {error || loading || content}
         </div>
     )
@@ -67,7 +70,7 @@ const View = ({ char: { name, description, thumbnail, homepage, wiki, comics } }
     const comicsList = comics.map((item, index) => {
         if (index <= 12) {
             return (
-                <li className="char__comics-item">
+                <li className="char__comics-item" key={index}>
                     {item.name}
                 </li>
             )
