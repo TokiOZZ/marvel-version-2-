@@ -14,8 +14,8 @@ class MarvelService {
         return await res.json()
     }
 
-    getAllCharacters = () => {
-        return this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`)
+    getAllCharacters = (limit = 9, offset = 210) => {
+        return this.getResource(`${this._apiBase}characters?limit=${limit}&offset=${offset}&${this._apiKey}`).then(res => res.data.results.map(item => this._transformData(item)))
     }
     getCharacter = (id) => {
         return this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`).then(res => this._transformData(res.data.results[0]))
@@ -36,8 +36,7 @@ class MarvelService {
             thumbnail: `${thumbnail.path}.${thumbnail.extension}`,
             home: urls[0].url,
             wiki: urls[1].url,
-            comics: comics.items
-
+            comics: comics.items,
         })
     }
 }

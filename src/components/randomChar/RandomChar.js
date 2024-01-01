@@ -21,8 +21,10 @@ const RandomChar = () => {
     const marvelService = new MarvelService()
 
     const onCharLoaded = (char) => {
+        setIsLoading(true)
         setChar(char)
         setIsLoading(false)
+        setIsError(false)
     }
 
     const onError = () => {
