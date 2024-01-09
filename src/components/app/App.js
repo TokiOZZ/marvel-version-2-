@@ -3,11 +3,12 @@ import AppHeader from "../appHeader/AppHeader";
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
+import ErrorBoundary from '../errorBoundary/ErrorBoundary';
 
 import decoration from '../../resources/img/vision.png';
 
 const App = () => {
-    const [id, setId] = useState(1011196)
+    const [id, setId] = useState(null)
     const onIdSet = (id) => {
         setId(id)
     }
@@ -18,7 +19,9 @@ const App = () => {
                 <RandomChar />
                 <div className="char__content">
                     <CharList onIdSet={onIdSet} />
-                    <CharInfo id={id} />
+                    <ErrorBoundary>
+                        <CharInfo id={id} />
+                    </ErrorBoundary>
                 </div>
                 <img className="bg-decoration" src={decoration} alt="vision" />
             </main>

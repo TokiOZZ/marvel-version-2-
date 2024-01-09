@@ -2,29 +2,22 @@ import { useState, useEffect } from 'react';
 import './charInfo.scss';
 import Spinner from '../spinner/Spinner'
 import ErrorMesage from '../error/ErrorMesage'
+import Skeleton from '../skeleton/Skeleton'
+
 
 
 import MarvelService from '../../services/MarvelService';
 
 const CharInfo = ({ id }) => {
-    const [char, setChar] = useState({
-        name: null,
-        description: null,
-        thumbnail: null,
-        homepage: null,
-        wiki: null,
-        comics: [],
-    })
-    const [isLoading, setIsLoading] = useState(true)
+    const [char, setChar] = useState(null)
+    const [isLoading, setIsLoading] = useState(false)
     const [isError, setIsError] = useState(false)
 
     const marvelService = new MarvelService()
 
     const onCharLoaded = (char) => {
-        setIsLoading(true)
         setChar(char)
         setIsLoading(false)
-        setIsError(false)
     }
 
     const onError = () => {
@@ -32,27 +25,33 @@ const CharInfo = ({ id }) => {
         setIsError(true)
     }
 
-    const getRandomChar = () => {
-        setIsError(false)
+    const onCharLoading = () => {
         setIsLoading(true)
+    }
+
+    const onUpdateChar = () => {
+        if (!id) {
+            return
+        }
+        onCharLoading()
         marvelService
             .getCharacter(id)
             .then(onCharLoaded)
             .catch(onError)
     }
 
-    useEffect(() => getRandomChar(), [id])
+    useEffect(() => onUpdateChar(), [id])
 
-    const content = !(isLoading || isError) ? <View char={char} /> : null
+    const content = !(isLoading || isError || !char) ? <View char={char} /> : null
     const loading = isLoading ? <Spinner /> : null
     const error = isError ? <ErrorMesage /> : null
-
+    const skeleton = isLoading || isError || content ? null : <Skeleton />
     const styleFix = isError ? { margin: "0 auto" } : null
 
 
     return (
         <div className="char__info" style={styleFix}>
-            {error || loading || content}
+            {skeleton || loading || error || content}
         </div>
     )
 }
@@ -68,7 +67,7 @@ const View = ({ char: { name, description, thumbnail, homepage, wiki, comics } }
         ? { objectFit: 'contain' }
         : null
     const comicsList = comics.map((item, index) => {
-        if (index <= 12) {
+        if (index < 10) {
             return (
                 <li className="char__comics-item" key={index}>
                     {item.name}
