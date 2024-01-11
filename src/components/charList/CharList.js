@@ -13,26 +13,42 @@ const CharList = ({ onIdSet }) => {
     const [isLoading, setIsLoading] = useState(true)
     const [isError, setIsError] = useState(false)
     const [selectedCharId, setSelectedCharId] = useState(null)
+    const [offset, setOffset] = useState(210)
+    const [newCharsLoading, setNewCharsLoading] = useState(false)
+    const [charsEnded, setCharsEnded] = useState(false)
 
     const marvelService = new MarvelService()
 
-    const onCharListLoaded = (charList) => {
+    const onCharListLoaded = (newChars) => {
+        let ended = false
+        if (newChars.length < 9) {
+            ended = true
+        }
+        console.log(newChars);
         setIsLoading(false)
-        setCharList(charList)
-        setSelectedCharId(charList[0].id)
+        setNewCharsLoading(false)
+        setCharList([...charList, ...newChars])
+        setOffset(offset + 9)
+        setCharsEnded(ended)
+
     }
     const onError = () => {
         setIsLoading(false)
         setIsError(true)
     }
-    const getCharList = () => {
-        setIsLoading(true)
+    const getCharList = (offset) => {
+        onCharListLoading()
         marvelService
-            .getAllCharacters()
+            .getAllCharacters(offset)
             .then(onCharListLoaded)
             .catch(onError)
 
     }
+    const onCharListLoading = () => {
+        setNewCharsLoading(true)
+    }
+
+
     useEffect(() => getCharList(), [])
 
     const content = !(isLoading || isError)
@@ -47,7 +63,11 @@ const CharList = ({ onIdSet }) => {
     return (
         <div className="char__list">
             {error || loading || content}
-            <button className="button button__main button__long">
+            <button
+                className="button button__main button__long"
+                onClick={() => getCharList(offset)}
+                disabled={newCharsLoading}
+                style={{ 'display': charsEnded ? 'none' : 'block' }}>
                 <div className="inner">load more</div>
             </button>
         </div>
@@ -65,7 +85,7 @@ const View = ({ charList, selectedCharId, setSelectedCharId, onIdSet }) => {
         const classNames = id !== selectedCharId ? "char__item" : "char__item char__item_selected"
 
         const styleFix = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg"
-            ? { objectFit: 'contain' }
+            ? { objectFit: 'unset' }
             : null
         return (
             <li className={classNames} key={id} onClick={onCharSelected} data-id={id}>
